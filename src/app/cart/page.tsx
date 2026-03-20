@@ -57,7 +57,7 @@ export default function CartPage() {
     }
 
     // Filter out any items where products is null
-    const validItems = (result as CartItem[]).filter(
+    const validItems = (result as unknown as CartItem[]).filter(
       (item) => item.products !== null
     );
     setItems(validItems);
@@ -203,11 +203,7 @@ export default function CartPage() {
                 <div className="flex-1 min-w-0 flex flex-col justify-between">
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      {item.products.category && (
-                        <p className="text-[10px] uppercase tracking-widest text-[#8a7060] font-semibold mb-1">
-                          {item.products.category}
-                        </p>
-                      )}
+
                       <Link href={`/shop/product/${item.products.id}`}>
                         <h3 className="font-serif text-base font-bold text-[#0f0a05] hover:text-[#7a5c44] transition-colors leading-snug">
                           {item.products.name}
