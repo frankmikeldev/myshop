@@ -24,7 +24,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     Promise.all([getAdminStats(), getRecentOrders()]).then(([s, o]) => {
       if (s && !("error" in s)) setStats(s as Stats);
-      if (Array.isArray(o)) setOrders(o as Order[]);
+      if (Array.isArray(o)) setOrders(o as unknown as Order[]);
       setLoading(false);
     });
   }, []);
