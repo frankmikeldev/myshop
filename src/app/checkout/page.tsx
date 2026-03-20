@@ -43,7 +43,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     getCart().then((data) => {
-      if (data && !("error" in data)) setCart(data as CartItem[]);
+      if (data && !("error" in data)) setCart(data as unknown as CartItem[]);
       setLoading(false);
     });
   }, []);
