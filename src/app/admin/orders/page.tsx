@@ -37,7 +37,7 @@ export default function AdminOrdersPage() {
   const fetchOrders = (status: string) => {
     setLoading(true);
     getAllOrders(status === "all" ? undefined : status).then((data) => {
-      if (Array.isArray(data)) setOrders(data as Order[]);
+      if (Array.isArray(data)) setOrders(data as unknown as Order[]);
       setLoading(false);
     });
   };
