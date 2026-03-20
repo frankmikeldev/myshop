@@ -83,7 +83,7 @@ export async function createOrder(shippingAddress: Record<string, string>) {
 
   // Calculate total
   const total = cartItems.reduce((sum, item) => {
-    const product = item.products as { price: number } | null;
+    const product = (Array.isArray(item.products) ? item.products[0] : item.products) as { price: number } | null;
     return sum + (product?.price ?? 0) * item.quantity;
   }, 0);
 
@@ -103,7 +103,7 @@ export async function createOrder(shippingAddress: Record<string, string>) {
 
   // Create order items
   const orderItems = cartItems.map((item) => {
-    const product = item.products as { id: string; price: number } | null;
+    const product = (Array.isArray(item.products) ? item.products[0] : item.products) as { id: string; price: number } | null;
     return {
       order_id: order.id,
       product_id: product?.id,
