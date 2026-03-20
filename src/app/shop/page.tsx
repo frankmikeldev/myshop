@@ -146,7 +146,7 @@ function ProductCard({ product, addedId, loadingId, onAddToCart }: {
 function SectionBlock({ title, subtitle, products, href, addedId, loadingId, onAddToCart, sectionRef }: {
   title: string; subtitle: string; products: Product[]; href: string;
   addedId: string | null; loadingId: string | null; onAddToCart: (id: string) => void;
-  sectionRef: React.RefObject<HTMLElement>;
+  sectionRef: React.RefObject<HTMLElement | null>;
 }) {
   return (
     <section ref={sectionRef} className="py-14 border-b border-[#ede8e0] last:border-0">
@@ -197,7 +197,7 @@ export default function ShopPage() {
   const handleFilter = (id: SectionId) => {
     setActiveSection(id);
     if (id === "all") { window.scrollTo({ top: 0, behavior: "smooth" }); return; }
-    const refMap: Record<string, React.RefObject<HTMLElement>> = {
+    const refMap: Record<string, React.RefObject<HTMLElement | null>> = {
       mens: mensRef, womens: womensRef, kids: kidsRef, accessories: accessRef,
     };
     const ref = refMap[id];

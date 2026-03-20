@@ -13,7 +13,7 @@ export default function AdminUsersPage() {
 
   const fetchUsers = () => {
     getAdminUsers().then((data) => {
-      if (Array.isArray(data)) setUsers(data as User[]);
+      if (Array.isArray(data)) setUsers(data as unknown as User[]);
       setLoading(false);
     });
   };

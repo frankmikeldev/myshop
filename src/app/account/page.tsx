@@ -70,7 +70,7 @@ export default function AccountDashboard() {
       try {
         const result = await getUserOrders();
         if (result && !("error" in result)) {
-          setOrders((result as Order[]).slice(0, 3));
+          setOrders((result as unknown as Order[]).slice(0, 3));
         }
       } catch {
         // orders stay empty

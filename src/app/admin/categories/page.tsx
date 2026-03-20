@@ -17,7 +17,7 @@ export default function AdminCategoriesPage() {
 
   const fetchCats = () => {
     getAdminCategories().then((data) => {
-      if (Array.isArray(data)) setCategories(data as Category[]);
+      if (Array.isArray(data)) setCategories(data as unknown as Category[]);
       setLoading(false);
     });
   };
