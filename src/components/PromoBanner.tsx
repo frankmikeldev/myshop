@@ -35,6 +35,13 @@ function Pad(n: number) {
 export default function PromoBanner() {
   const { days, hours, minutes, seconds } = useCountdown(SALE_END);
 
+  // ✅ Add this state
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <section className="w-full bg-[#0f0a05] overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
@@ -75,9 +82,18 @@ export default function PromoBanner() {
                 <div key={unit.label} className="flex items-center gap-3">
                   <div className="text-center">
                     <div className="bg-white/10 border border-white/10 rounded-xl w-16 h-16 flex items-center justify-center">
-                      <span className="text-2xl font-bold text-white font-serif tabular-nums">
-                        {Pad(unit.value)}
-                      </span>
+
+                      {/* ✅ Wrapped countdown display */}
+                      {!mounted ? (
+                        <span className="text-2xl font-bold text-white font-serif tabular-nums">
+                          00
+                        </span>
+                      ) : (
+                        <span className="text-2xl font-bold text-white font-serif tabular-nums">
+                          {Pad(unit.value)}
+                        </span>
+                      )}
+
                     </div>
                     <p className="text-[10px] uppercase tracking-widest text-white/40 mt-1.5 font-semibold">
                       {unit.label}
@@ -116,7 +132,6 @@ export default function PromoBanner() {
 
           {/* ── Right: Image ── */}
           <div className="flex-1 w-full lg:w-auto relative">
-            {/* Decorative glow */}
             <div className="absolute inset-0 bg-gradient-to-r from-amber-400/20 to-orange-500/10 rounded-3xl blur-3xl" />
 
             <div className="relative w-full aspect-[4/5] max-w-sm mx-auto lg:max-w-none rounded-3xl overflow-hidden bg-[#1a1208]">
@@ -131,7 +146,6 @@ export default function PromoBanner() {
                 }}
               />
 
-              {/* Discount badge overlay */}
               <div className="absolute top-6 right-6 w-20 h-20 bg-red-500 rounded-full flex flex-col items-center justify-center shadow-lg rotate-12">
                 <span className="text-white text-xl font-black font-serif leading-none">
                   50%
