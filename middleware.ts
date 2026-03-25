@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,32 +16,39 @@ export async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value)
           );
-          supabaseResponse = NextResponse.next({ request });
+          response = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            response.cookies.set(name, value, options)
           );
         },
       },
     }
   );
 
-  // Refresh session — do not remove this
+  // Get current user from Supabase session
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
-  // ── Admin protection ──────────────────────────────────────
-  if (pathname.startsWith("/admin") && pathname !== "/admin-login") {
-    // Not logged in → admin login
+  // ── Define routes ─────────────────────────────────────────
+  const unprotectedAuthPaths = ["/account/login", "/account/signup"];
+  const protectedPaths = ["/account", "/checkout", "/orders"];
+  
+  // Admin pages
+  const adminPaths = ["/admin"];
+  const adminLoginPath = "/admin-login";
+
+  // ── Admin route protection ───────────────────────────────
+  if (adminPaths.some((path) => pathname.startsWith(path)) && pathname !== adminLoginPath) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin-login";
+      url.pathname = adminLoginPath;
       return NextResponse.redirect(url);
     }
 
-    // Check role from JWT app_metadata (no DB query needed)
+    // Check admin role
     const role = user.app_metadata?.role;
     if (role !== "admin") {
       const url = request.nextUrl.clone();
@@ -49,13 +56,12 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
-    return supabaseResponse;
+    return response;
   }
 
-  // ── Protected user routes ─────────────────────────────────
-  const protectedPaths = ["/account", "/checkout", "/orders"];
-  const isProtected = protectedPaths.some((path) =>
-    pathname.startsWith(path)
+  // ── Protected user routes ────────────────────────────────
+  const isProtected = protectedPaths.some(
+    (path) => pathname.startsWith(path) && !unprotectedAuthPaths.includes(pathname)
   );
 
   if (isProtected && !user) {
@@ -65,19 +71,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  // ── Redirect logged-in users away from auth pages ─────────
-  const authPaths = ["/account/login", "/account/signup"];
-  const isAuthPage = authPaths.some((path) => pathname.startsWith(path));
-
+  // ── Redirect logged-in users away from login/signup ──────
+  const isAuthPage = unprotectedAuthPaths.includes(pathname);
   if (isAuthPage && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/account";
     return NextResponse.redirect(url);
   }
 
-  return supabaseResponse;
+  return response;
 }
 
+// ── Matcher ───────────────────────────────────────────────
 export const config = {
   matcher: [
     "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
